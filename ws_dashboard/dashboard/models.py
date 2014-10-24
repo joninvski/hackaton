@@ -57,7 +57,7 @@ class Message(models.Model):
 
 class Data(models.Model): 
     owner = models.ForeignKey(Employee, related_name="data_employee")
-    volume = models.FloatField(help_text="Amount of kb exchanged")
+    volume = models.IntegerField(help_text="Amount of kb exchanged")
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
     start_time = models.DateTimeField() 

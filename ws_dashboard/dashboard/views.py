@@ -10,7 +10,7 @@ def index(requesti):
 
 def company(request, company_id):
     try:
-        response = {}
+        response_body = {}
         c = Company.objects.get(pk=company_id)
         employees = Employee.objects.filter(company=c)
         calls = Call.objects.filter(owner__in=employees)
@@ -32,16 +32,17 @@ def company(request, company_id):
         total_data_outgoing = sum([d.volume for d in 
             data if d.data_type == 2])
 
-        response['total_calls_incoming'] = total_calls_incoming 
-        response['total_calls_outgoing'] = total_calls_outgoing
+        response_body['total_calls_incoming'] = total_calls_incoming 
+        response_body['total_calls_outgoing'] = total_calls_outgoing
 
-        response['total_messages_incoming'] = total_messages_incoming
-        response['total_messages_outgoing'] = total_messages_outgoing
+        response_body['total_messages_incoming'] = total_messages_incoming
+        response_body['total_messages_outgoing'] = total_messages_outgoing
        
-        response['total_data_incoming'] = total_data_incoming
-        response['total_data_outgoing'] = total_data_outgoing
+        response_body['total_data_incoming'] = total_data_incoming
+        response_body['total_data_outgoing'] = total_data_outgoing
          
-        return HttpResponse(json.dumps(response))
+        response = HttpResponse(json.dumps(response_body))
+        return HttpResponse(response, content_type="application/json")
     except Company.DoesNotExist:
         return HttpResponseNotFound()
 
