@@ -1,3 +1,10 @@
 from django.contrib import admin
 
-# Register your models here.
+from dashboard.models import *
+
+admin.site.register(Company)
+admin.site.register(Employee)
+admin.site.register(Call)
+admin.site.register(Message)
+admin.site.register(Data)
+
