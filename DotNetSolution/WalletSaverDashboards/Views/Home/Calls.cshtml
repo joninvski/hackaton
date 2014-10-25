@@ -4,12 +4,11 @@
 }
 
 <div class="row">
-    <div class="col-md-4 text-center">
-        <div id="pie1"></div>
-        <h3>Calls</h3>
+    <div class="col-md-2 text-center">
+        <h3>Menu</h3>
     </div>
-    <div class="col-md-8 text-center">
-        <div id="pie2"></div>
+    <div class="col-md-10 text-center">
+        <div id="pie1"></div>
         <h3>Data</h3>
     </div>
 </div>
@@ -41,10 +40,11 @@
                 window.location.href = clickToUrl;
             }
 
-            var n = 4, // number of layers
-            m = 58, // number of samples per layer
+            var n = 1, // number of layers
+            m = 5, // number of samples per layer
             stack = d3.layout.stack(),
-            layers = stack(d3.range(n).map(function() { return bumpLayer(m, .1); })),
+            layers = data,
+            //layers = stack(d3.range(n).map(function() { return bumpLayer(m, .1); })),
             yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
             yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
 
@@ -70,7 +70,7 @@
                 .tickPadding(6)
                 .orient("bottom");
 
-            var svg = d3.select("body").append("svg")
+            var svg = d3.select(elem).append("svg:svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
               .append("g")
@@ -156,21 +156,18 @@
                 for (i = 0; i < 5; ++i) bump(a);
                 return a.map(function(d, i) { return {x: i, y: Math.max(0, d)}; });
 
+            }
         }
 
 
-        var inboundData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+        var inboundData = [[{ x: 0, y: 100, y0: 0 }, { x: 1, y: 200, y0: 0 }, { x: 2, y: 300, y0: 0 }, { x: 3, y: 400, y0: 0 }, { x: 4, y: 500, y0: 0 }]]// @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
 
         var Model = {
             data: ko.mapping.fromJS(inboundData),
-
-            firstPie: [inboundData.total_calls_incoming, inboundData.total_calls_outgoing],
-            secondPie: [inboundData.total_data_incoming, inboundData.total_data_outgoing],
-            thirdPie: [inboundData.total_messages_incoming, inboundData.total_messages_outgoing]
         };
 
         ko.applyBindings(Model);
-        DrawStackedToGrouped("#pie1", 300, 300, Model.firstPie, "/Home/Calls");        
+        DrawStackedToGrouped("#pie1", 800, 300, Model.data(), "/Home/Calls");        
 
     </script>
 }
