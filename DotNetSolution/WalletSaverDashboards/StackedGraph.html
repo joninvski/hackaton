@@ -1,0 +1,224 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Calls</title>
+    <link href="/Content/css?v=m8KdMFOCcNeZrATLbCQ_9gxex1_Ma7rE5iJzJXojUIk1" rel="stylesheet" />
+
+    <script src="/bundles/modernizr?v=wBEWDufH_8Md-Pbioxomt90vm6tJN2Pyy9u9zHtWsPo1"></script>
+
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Application name</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/Help">API</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+
+
+
+
+        <div class="row">
+            <div class="col-md-2 text-center">
+                <h3>Menu</h3>
+            </div>
+            <div class="col-md-10 text-center">
+                <div id="pie1"></div>
+                <h3>Data</h3>
+            </div>
+        </div>
+
+
+        <hr />
+        <footer>
+            <p>&copy; 2014 - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    <script src="/bundles/jquery?v=FVs3ACwOLIVInrAl5sdzR2jrCDmVOWFbZMY6g6Q0ulE1"></script>
+
+    <script src="/bundles/bootstrap?v=DdpNu246U9ITBOvEi3KX3m7o4UR-4TjBtK0GMu3Zhi01"></script>
+
+
+    <script>
+        function DrawStackedToGrouped (elem, w, h, data, clickToUrl)
+        {
+            function animateFirstStep()
+            {
+                d3.select(this)
+                    .transition()
+                    .attr("d",arc)
+                    .style("fill", "black");
+            }
+
+            function animateSecondStep()
+            {
+                d3.select(this)
+                    .transition()
+                    .ease("elastic")
+                    .duration(1500)
+                    .attr("d", arc)
+                    .style("fill", function(d) { return color(d.data)});
+            }
+
+            function click()
+            {
+                window.location.href = clickToUrl;
+            }
+
+            var n = 1, // number of layers
+            m = 5, // number of samples per layer
+            stack = d3.layout.stack(),
+            layers = data,
+            //layers = stack(d3.range(n).map(function() { return bumpLayer(m, .1); })),
+            yGroupMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y; }); }),
+            yStackMax = d3.max(layers, function(layer) { return d3.max(layer, function(d) { return d.y0 + d.y; }); });
+
+            var margin = {top: 40, right: 10, bottom: 20, left: 10},
+                width = w - margin.left - margin.right,
+                height = h - margin.top - margin.bottom;
+
+            var x = d3.scale.ordinal()
+                .domain(d3.range(m))
+                .rangeRoundBands([0, width], .08);
+
+            var y = d3.scale.linear()
+                .domain([0, yStackMax])
+                .range([height, 0]);
+
+            var color = d3.scale.linear()
+                .domain([0, n - 1])
+                .range(["#aad", "#556"]);
+
+            var xAxis = d3.svg.axis()
+                .scale(x)
+                .tickSize(0)
+                .tickPadding(6)
+                .orient("bottom");
+
+            var svg = d3.select(elem).append("svg:svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var layer = svg.selectAll(".layer")
+                .data(layers)
+              .enter().append("g")
+                .attr("class", "layer")
+                .style("fill", function(d, i) { return color(i); });
+
+            var rect = layer.selectAll("rect")
+                .data(function(d) { return d; })
+              .enter().append("rect")
+                .attr("x", function(d) { return x(d.x); })
+                .attr("y", height)
+                .attr("width", x.rangeBand())
+                .attr("height", 0);
+
+            rect.transition()
+                .delay(function(d, i) { return i * 10; })
+                .attr("y", function(d) { return y(d.y0 + d.y); })
+                .attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); });
+
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+
+            d3.selectAll("input").on("change", change);
+
+            var timeout = setTimeout(function() {
+                d3.select("input[value=\"grouped\"]").property("checked", true).each(change);
+            }, 2000);
+
+            function change() {
+                clearTimeout(timeout);
+                if (this.value === "grouped") transitionGrouped();
+                else transitionStacked();
+            }
+
+            function transitionGrouped() {
+                y.domain([0, yGroupMax]);
+
+                rect.transition()
+                    .duration(500)
+                    .delay(function(d, i) { return i * 10; })
+                    .attr("x", function(d, i, j) { return x(d.x) + x.rangeBand() / n * j; })
+                    .attr("width", x.rangeBand() / n)
+                  .transition()
+                    .attr("y", function(d) { return y(d.y); })
+                    .attr("height", function(d) { return height - y(d.y); });
+            }
+
+            function transitionStacked() {
+                y.domain([0, yStackMax]);
+
+                rect.transition()
+                    .duration(500)
+                    .delay(function(d, i) { return i * 10; })
+                    .attr("y", function(d) { return y(d.y0 + d.y); })
+                    .attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); })
+                  .transition()
+                    .attr("x", function(d) { return x(d.x); })
+                    .attr("width", x.rangeBand());
+            }
+
+            // Inspired by Lee Byron's test data generator.
+            function bumpLayer(n, o) {
+
+                function bump(a) {
+                    var x = 1 / (.1 + Math.random()),
+                        y = 2 * Math.random() - .5,
+                        z = 10 / (.1 + Math.random());
+                    for (var i = 0; i < n; i++) {
+                        var w = (i / n - y) * z;
+                        a[i] += x * Math.exp(-w * w);
+                    }
+                }
+
+                var a = [], i;
+                for (i = 0; i < n; ++i) a[i] = o + o * Math.random();
+                for (i = 0; i < 5; ++i) bump(a);
+                return a.map(function(d, i) { return {x: i, y: Math.max(0, d)}; });
+
+            }
+        }
+
+
+        var inboundData = [[{ x: 0, y: 100, y0: 0 }, { x: 1, y: 200, y0: 0 }, { x: 2, y: 300, y0: 0 }, { x: 3, y: 400, y0: 0 }, { x: 4, y: 500, y0: 0 }]]// null;
+
+        var Model = {
+            data: ko.mapping.fromJS(inboundData),
+        };
+
+        ko.applyBindings(Model);
+        DrawStackedToGrouped("#pie1", 800, 300, Model.data(), "/Home/Calls");
+
+    </script>
+
+
+    <!-- Visual Studio Browser Link -->
+    <script type="application/json" id="__browserLink_initializationData">
+        {"appName":"Internet Explorer","requestId":"07cfda2db75c4f0abe622a9be0a8a5e4"}
+    </script>
+    <script type="text/javascript" src="http://localhost:2540/61aa644c75a24d2da5b458df420acd4b/browserLink" async="async"></script>
+    <!-- End Browser Link -->
+
+</body>
+</html>

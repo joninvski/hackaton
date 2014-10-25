@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Home Page</title>
+    <link href="/Content/css?v=m8KdMFOCcNeZrATLbCQ_9gxex1_Ma7rE5iJzJXojUIk1" rel="stylesheet" />
+
+    <script src="/bundles/modernizr?v=wBEWDufH_8Md-Pbioxomt90vm6tJN2Pyy9u9zHtWsPo1"></script>
+
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">Application name</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/Help">API</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <div id="pie1"></div>
+                <h3>Calls</h3>
+            </div>
+            <div class="col-md-4 text-center">
+                <div id="pie2"></div>
+                <h3>Data</h3>
+            </div>
+            <div class="col-md-4 text-center">
+                <div id="pie3"></div>
+                <h3>Messages</h3>
+            </div>
+        </div>
+
+
+        <hr />
+        <footer>
+            <p>&copy; 2014 - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    <script src="/bundles/jquery?v=FVs3ACwOLIVInrAl5sdzR2jrCDmVOWFbZMY6g6Q0ulE1"></script>
+
+    <script src="/bundles/bootstrap?v=DdpNu246U9ITBOvEi3KX3m7o4UR-4TjBtK0GMu3Zhi01"></script>
+
+
+    <script>
+        function DrawPieChart (elem, w, h, data, clickToUrl)
+        {
+            function animateFirstStep()
+            {
+                d3.select(this)
+                    .transition()
+                    .attr("d",arc)
+                    .style("fill", "black");
+            }
+
+            function animateSecondStep()
+            {
+                d3.select(this)
+                    .transition()
+                    .ease("elastic")
+                    .duration(1500)
+                    .attr("d", arc)
+                    .style("fill", function(d) { return color(d.data)});
+            }
+
+            function click()
+            {
+                window.location.href = clickToUrl;
+            }
+
+            var radius = Math.min(w, h) / 2;
+            var width = w;
+            var height = h;
+
+            var color = d3.scale.ordinal()
+                .range(["#98abc5", "#ff8c00"]);
+
+            var arc = d3.svg.arc()
+                .outerRadius(radius - 10)
+                .innerRadius(0);
+
+            var pie = d3.layout.pie()
+                .sort(null)
+                .value(function(d) { return d; });
+
+            var svg = d3.select(elem).append("svg:svg")
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+            data.forEach(function(d) {
+                d = +d;
+            });
+
+            var g = svg.selectAll(".arc")
+                .data(pie(data))
+              .enter().append("g")
+                .attr("class", "arc");
+
+            g.append("path")
+                .attr("d", arc)
+                .style("fill", function(d) { return color(d.data); })
+                .on("mouseover", animateFirstStep)
+                .on("mouseout", animateSecondStep)
+                .on("click", click);
+
+            g.append("text")
+                .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+                .attr("dy", ".35em")
+                .style("text-anchor", "middle")
+                .text(function(d) { return d.data; });
+
+        }
+
+
+        var inboundData = {"total_calls_outgoing":222,"total_calls_incoming":111,"total_messages_outgoing":666,"total_messages_incoming":555,"total_data_outgoing":444,"total_data_incoming":333};
+
+        var Model = {
+            data: ko.mapping.fromJS(inboundData),
+
+            firstPie: [inboundData.total_calls_incoming, inboundData.total_calls_outgoing],
+            secondPie: [inboundData.total_data_incoming, inboundData.total_data_outgoing],
+            thirdPie: [inboundData.total_messages_incoming, inboundData.total_messages_outgoing]
+        };
+
+        ko.applyBindings(Model);
+        DrawPieChart("#pie1", 300, 300, Model.firstPie, "/Home/Calls");
+        DrawPieChart("#pie2", 300, 300, Model.secondPie, "/Home/Data");
+        DrawPieChart("#pie3", 300, 300, Model.thirdPie, "/Home/Messages");
+
+    </script>
+
+
+    <!-- Visual Studio Browser Link -->
+    <script type="application/json" id="__browserLink_initializationData">
+        {"appName":"Internet Explorer","requestId":"55422c2fa4eb41ee85b58e8ee3e1be99"}
+    </script>
+    <script type="text/javascript" src="http://localhost:2540/61aa644c75a24d2da5b458df420acd4b/browserLink" async="async"></script>
+    <!-- End Browser Link -->
+
+</body>
+</html>
