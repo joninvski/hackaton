@@ -1,12 +1,16 @@
 from django.shortcuts import render
+from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseNotFound
  
 from dashboard.models import *
 
+import time
+import datetime
 import json
+import random
 import itertools
 
-def index(requesti):
+def index(request):
     return HttpResponse("WalletSaver Hackathon Dashboard Project")
 
 def company(request, company_id):
