@@ -7,8 +7,11 @@ namespace WalletSaverDashboards.Models
 {
     public class Home
     {
-        public int total_seconds { get; set; }
-        public int total_msg { get; set; }
-        public int total_trafic { get; set; }
+        public int total_calls_outgoing { get; set; }
+        public int total_calls_incoming { get; set; }
+        public int total_messages_outgoing { get; set; }
+        public int total_messages_incoming { get; set; }
+        public int total_data_outgoing { get; set; }
+        public int total_data_incoming { get; set; }
     }
 }

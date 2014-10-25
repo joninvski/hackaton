@@ -19,6 +19,9 @@ namespace WalletSaverDashboards
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include(
                       "~/Scripts/bootstrap.js",
                       "~/Scripts/respond.js",
+                      "~/Scripts/knockout-2.0.0.debug.js",
+                      "~/Scripts/knockout.mapping-latest.debug.js",
+                      "~/Scripts/respond.js",
                       "~/Scripts/d3.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
