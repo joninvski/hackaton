@@ -68,4 +68,5 @@ class Data(models.Model):
     class Meta:
         verbose_name_plural = "Data"
 
-# Create your models here.
+
+
